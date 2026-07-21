@@ -9,10 +9,11 @@ require('dotenv').config();
 
 const routes = require('./routes');
 const { sequelize } = require('./models');
+const healthController = require('./controllers/health.controller');
 const { errorResponse, successResponse } = require('./utils/response');
 
 const app = express();
-const port = Number(process.env.APP_PORT || 5000);
+const port = Number(process.env.PORT || process.env.APP_PORT || 5000);
 
 app.use(helmet({
   crossOriginResourcePolicy: { policy: 'cross-origin' }
@@ -37,6 +38,8 @@ app.get('/health', (req, res) => {
     uptime: process.uptime()
   });
 });
+
+app.get('/health/database', healthController.database);
 
 app.use('/api', routes);
 

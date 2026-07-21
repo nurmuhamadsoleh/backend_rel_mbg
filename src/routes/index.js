@@ -11,9 +11,11 @@ const strukturRoute = require('./struktur.route');
 const anggotaRoute = require('./anggota.route');
 const pendaftaranRoute = require('./pendaftaran.route');
 const programRoute = require('./program.route');
+const healthRoute = require('./health.route');
 
 const router = express.Router();
 
+router.use('/health', healthRoute);
 router.use('/auth', authRoute);
 router.use('/categories', categoryRoute);
 router.use('/galleries', galleryRoute);
