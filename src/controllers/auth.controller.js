@@ -40,8 +40,10 @@ const register = asyncHandler(async (req, res) => {
 });
 
 const login = asyncHandler(async (req, res) => {
+  const email = String(req.body.email || '').trim().toLowerCase();
+
   const user = await User.scope('withPassword').findOne({
-    where: { email: req.body.email }
+    where: { email }
   });
 
   if (!user) {
