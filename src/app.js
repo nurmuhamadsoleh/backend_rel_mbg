@@ -14,7 +14,8 @@ const { rejectDangerousPayload } = require('./middlewares/security.middleware');
 const { errorResponse, successResponse } = require('./utils/response');
 
 const app = express();
-const port = Number(process.env.APP_PORT || 5000);
+const port = Number(process.env.APP || process.env.APP_PORT || 5000);
+
 
 app.use(helmet({
   crossOriginResourcePolicy: { policy: 'cross-origin' }
@@ -131,7 +132,7 @@ async function bootstrap() {
     await ensureOrganizationInfoSchema();
     await ensureLocationSchema();
 
-    app.listen(port, () => {
+    app.listen(port,"0.0.0.0", () => {
       console.log(`Backend CMS REL MBG berjalan di port ${port}`);
     });
   } catch (error) {
