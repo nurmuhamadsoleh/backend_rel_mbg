@@ -1,4 +1,5 @@
 const { Op } = require('sequelize');
+const QRCode = require('qrcode');
 const { Anggota, Pendaftaran } = require('../models');
 const asyncHandler = require('../utils/asyncHandler');
 const convertToWebp = require('../utils/convertWebp');
@@ -65,6 +66,23 @@ function getDefaultValidUntil() {
   date.setFullYear(date.getFullYear() + 1);
 
   return date.toISOString().slice(0, 10);
+}
+
+async function buildKtaQrCode(member) {
+  const payload = {
+    nama_anggota: member.name || '-',
+    nomor_anggota: member.member_number || '-',
+    status_keanggotaan: member.member_status || 'Aktif',
+    masa_berlaku: member.valid_until || '-',
+    lokasi: member.location || '-',
+    sumber_website: 'relmbg.co.id'
+  };
+
+  return QRCode.toDataURL(JSON.stringify(payload), {
+    errorCorrectionLevel: 'M',
+    margin: 1,
+    width: 360
+  });
 }
 
 async function moveRegistrationToVolunteer(data) {
@@ -188,6 +206,8 @@ const checkStatus = asyncHandler(async (req, res) => {
     return errorResponse(res, 'Data pendaftaran tidak ditemukan', [], 404);
   }
 
+  const qrCodeUrl = await buildKtaQrCode(member);
+
   return successResponse(res, 'KTA anggota REL MBG berhasil ditemukan', {
     id: member.id,
     full_name: member.name,
@@ -196,6 +216,15 @@ const checkStatus = asyncHandler(async (req, res) => {
     valid_until: member.valid_until,
     full_address: member.location,
     photo_url: member.photo_url,
+    qr_code_url: qrCodeUrl,
+    qr_payload: {
+      nama_anggota: member.name || '-',
+      nomor_anggota: member.member_number || '-',
+      status_keanggotaan: member.member_status || 'Aktif',
+      masa_berlaku: member.valid_until || '-',
+      lokasi: member.location || '-',
+      sumber_website: 'relmbg.co.id'
+    },
     is_verified: true,
     is_approved: true,
     is_kta_issued: true,
